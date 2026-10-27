@@ -34,7 +34,7 @@ export function HistoryChart({ history }: HistoryChartProps) {
         <h2 className="text-sm font-semibold tracking-wide text-zinc-300 uppercase">
           История показателей (последние 60 с)
         </h2>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
           {SERIES.map((s) => (
             <span key={s.key} className="flex items-center gap-1 text-xs text-zinc-300">
               <span

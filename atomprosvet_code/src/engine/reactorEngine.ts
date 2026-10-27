@@ -125,14 +125,20 @@ function pseudoNoise(timeSec: number): number {
 }
 
 /**
- * Наибольшая мощность, при которой температура в установившемся режиме
- * остаётся в норме (не выше normalMax) — длительно держать мощность выше
- * этого значения значит медленно терять безопасность. Выводится из
- * констант модели, чтобы подсказки в интерфейсе не расходились с физикой.
+ * Наибольшая мощность, при которой и температура, и давление в
+ * установившемся режиме остаются в норме: длительно держать мощность выше
+ * этого значения значит медленно терять безопасность. Давление упирается в
+ * свой предел раньше температуры (с учётом его колебаний), поэтому предел
+ * считается по более строгому из двух. Выводится из констант модели, чтобы
+ * подсказки в интерфейсе не расходились с физикой.
  */
 export function maxSustainablePower(): number {
+  const temperatureLimit = TEMPERATURE_THRESHOLDS.normalMax;
+  const pressureLimit =
+    (PRESSURE_MAX_NORMAL - PRESSURE_BASE - PRESSURE_NOISE_AMPLITUDE) /
+    PRESSURE_PER_DEGREE;
   const ratio =
-    (TEMPERATURE_THRESHOLDS.normalMax - TEMP_AT_ZERO_POWER) /
+    (Math.min(temperatureLimit, pressureLimit) - TEMP_AT_ZERO_POWER) /
     (TEMP_AT_FULL_POWER - TEMP_AT_ZERO_POWER);
   return Math.floor(ratio * 100);
 }

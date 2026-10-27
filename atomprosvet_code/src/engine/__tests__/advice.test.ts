@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getAdvice } from "../advice";
-import { createInitialState, maxSustainablePower } from "../reactorEngine";
+import { createInitialState, maxSustainablePower, tick } from "../reactorEngine";
 import { spawnEvent } from "../events";
 import type { ReactorState } from "../types";
 
@@ -15,10 +15,19 @@ function calm(overrides: Partial<ReactorState> = {}): ReactorState {
 }
 
 describe("maxSustainablePower", () => {
-  it("лежит между 0 и 100 и соответствует границе нормы температуры", () => {
+  it("лежит между 0 и 100", () => {
     const limit = maxSustainablePower();
     expect(limit).toBeGreaterThan(50);
     expect(limit).toBeLessThan(100);
+  });
+
+  it("при такой мощности безопасность не падает всю смену", () => {
+    let s = createInitialState();
+    for (let t = 0; t < 300; t++) {
+      s = tick(s, { setTargetPower: maxSustainablePower() });
+    }
+    expect(s.isMeltdown).toBe(false);
+    expect(s.minSafetySoFar).toBe(100);
   });
 });
 
